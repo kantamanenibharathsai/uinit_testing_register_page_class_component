@@ -134,6 +134,7 @@ interface FormData {
     username: string;
     contactNumber: string;
     password: string;
+    [key: string]: string; 
 }
 
 interface State {
@@ -164,14 +165,12 @@ class Register extends Component<{}, State> {
 
     handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        console.log(value, "value")
         this.setState(prevState => ({
             formData: {
                 ...prevState.formData,
                 [name]: value
             }
         }), () => {
-            // Validate input fields after state is updated
             this.validateField(name, value);
         });
     }
@@ -188,11 +187,10 @@ class Register extends Component<{}, State> {
             case 'contactNumber':
                 errorMessage = value ? (/^\d{10}$/.test(value) ? '' : '*Contact number must be a valid 10-digit number!') : '*Contact number is required!';
                 break;
-            case 'password':
+            default:
                 errorMessage = value ? (/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,15}/.test(value) ? '' : '*Password must contain at least one uppercase letter, one lowercase letter, and one number, and must be between 6 and 15 characters long.') : '*Password is required!';
                 break;
-            default:
-                break;
+        
         }
 
         this.setState(prevState => ({
@@ -204,26 +202,33 @@ class Register extends Component<{}, State> {
     }
 
     validateEmail = (email: string) => {
-        // Email validation regex
         const regex = /^(([^<>()/[\]\\.,;:\s@"]+(\.[^<>()/[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         return regex.test(String(email).toLowerCase());
     }
 
     onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const { formData, errors } = this.state;
+        const { formData } = this.state;
 
-        // Check if there are any errors before submitting
+        const errors: { [key: string]: string } = {};
+        Object.keys(formData).forEach(fieldName => {
+            if (!formData[fieldName]) {
+                errors[fieldName] = `*${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required!`;
+            } else {
+                this.validateField(fieldName, formData[fieldName]);
+            }
+        });
+
         const hasErrors = Object.values(errors).some(error => error !== '');
 
         if (!hasErrors) {
-            console.table(formData);
-            console.log(errors);
             this.setState({ successfulMsg: 'Registration Successful', errors: {} });
         } else {
-            this.setState({ successfulMsg: '' });
+            this.setState({ errors, successfulMsg: '' });
         }
     };
+
+
 
     render() {
         const { isPasswordVisible, formData, errors, successfulMsg } = this.state;
@@ -237,11 +242,12 @@ class Register extends Component<{}, State> {
                     <Box component={"form"} data-testid="submit-form" sx={registerPageStyles.formContainer} onSubmit={this.onSubmit} noValidate autoComplete="off">
                         <Box sx={registerPageStyles.labelInputContainer}>
                             <Box component="label" htmlFor="Email" sx={registerPageStyles.labelText}>Enter your email</Box>
-                            <TextField id="Email" fullWidth placeholder="Email Address" type="email" data-testid="email-input"
+                            <TextField id="Email" fullWidth placeholder="Email Address" type="email" inputProps={{ "data-testid": "email-input" }}
                                 sx={registerPageStyles.textFieldStyle}
                                 onChange={this.handleInputChange}
                                 value={formData.email}
-                         
+                                name="email"
+
                             />
                             {errors.email && <Box data-testid="email-error" sx={registerPageStyles.errorText} component={"span"}>{errors.email}</Box>}
                         </Box>
@@ -251,36 +257,39 @@ class Register extends Component<{}, State> {
                                 sx={registerPageStyles.textFieldStyle}
                                 onChange={this.handleInputChange}
                                 value={formData.username}
-                             
+                                name="username"
+                                inputProps={{ "data-testid": "username-input" }}
+
                             />
                             {errors.username && <Box data-testid="username-error" sx={registerPageStyles.errorText} component={"span"}>{errors.username}</Box>}
                         </Box>
                         <Box sx={registerPageStyles.labelInputContainer}>
                             <Box component="label" htmlFor="contactNumber" sx={registerPageStyles.labelText}>Contact Number</Box>
-                            <TextField data-testid="contactNumber-input" sx={registerPageStyles.textFieldStyle} id="contactNumber" fullWidth placeholder="Contact Number" type="number"
+                            <TextField inputProps={{ "data-testid": "contactNumber-input" }} sx={registerPageStyles.textFieldStyle} id="contactNumber" fullWidth placeholder="Contact Number" type="number"
                                 onChange={this.handleInputChange}
                                 value={formData.contactNumber}
-                       
+                                name="contactNumber"
+
                             />
-                            {errors.contactNumber && <Box component={"span"} sx={registerPageStyles.errorText}>{errors.contactNumber}</Box>}
+                            {errors.contactNumber && <Box component={"span"} data-testid="contactNumber-error" sx={registerPageStyles.errorText}>{errors.contactNumber}</Box>}
                         </Box>
                         <Box sx={registerPageStyles.labelInputContainer}>
                             <Box component="label" htmlFor="password" sx={registerPageStyles.labelText}>Enter your Password</Box>
-                            <TextField data-testid="password-input" sx={registerPageStyles.textFieldStyle} id="password" fullWidth placeholder="Password" type={isPasswordVisible ? "text" : "password"}
+                            <TextField inputProps={{ "data-testid": "password-input" }} name="password" sx={registerPageStyles.textFieldStyle} id="password" fullWidth placeholder="Password" type={isPasswordVisible ? "text" : "password"}
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">
-                                            {isPasswordVisible ? <VisibilityIcon sx={registerPageStyles.passwordIcon} onClick={this.passwordVisibleOrNotHandler} /> : <VisibilityOffIcon sx={registerPageStyles.passwordIcon} onClick={this.passwordVisibleOrNotHandler} />}
+                                            {isPasswordVisible ? <VisibilityIcon data-testid="visible-icon" sx={registerPageStyles.passwordIcon} onClick={this.passwordVisibleOrNotHandler} /> : <VisibilityOffIcon data-testid="visible-off-icon" sx={registerPageStyles.passwordIcon} onClick={this.passwordVisibleOrNotHandler} />}
                                         </InputAdornment>
                                     )
                                 }}
                                 onChange={this.handleInputChange}
                                 value={formData.password}
-                           
+
                             />
-                            {errors.password && <Box component={"span"} sx={registerPageStyles.errorText}>{errors.password}</Box>}
+                            {errors.password && <Box component={"span"} data-testid="password-error" sx={registerPageStyles.errorText}>{errors.password}</Box>}
                         </Box>
-                        <Button disableElevation disableFocusRipple disableRipple disableTouchRipple sx={registerPageStyles.SignupButton} type="submit">Sign up</Button>
+                        <Button data-testid="submit-button" disableElevation disableFocusRipple disableRipple disableTouchRipple sx={registerPageStyles.SignupButton} type="submit">Sign up</Button>
                     </Box>
                     {successfulMsg && (<Typography sx={registerPageStyles.successfulMsg}>{successfulMsg}</Typography>)}
                 </Box>
