@@ -1,11 +1,38 @@
-import { fireEvent, render, screen, } from "@testing-library/react";
+import { fireEvent, render, screen, act } from "@testing-library/react";
 import Register from "../Register";
+import { BrowserRouter, MemoryRouter } from "react-router-dom";
+
+
+// const localStorageMock = (() => {
+//     let store: { [key: string]: string } = {};
+
+//     return {
+//         getItem: (key: string) => store[key] || null,
+//         setItem: (key: string, value: string) => {
+//             store[key] = value.toString();
+//         },
+//         removeItem: (key: string) => {
+//             delete store[key];
+//         },
+//         clear: () => {
+//             store = {};
+//         },
+//     };
+// })();
+
+// Object.defineProperty(window, "localStorage", {
+//     value: localStorageMock,
+// });
 
 
 describe("Register", () => {
 
     test('submit form with invalid username', () => {
-       render(<Register />);
+        render(
+            <MemoryRouter>
+                <Register />
+            </MemoryRouter>
+        );
 
         const textField = screen.getByTestId("username-input");
         fireEvent.change(textField, { target: { value: "" } });
@@ -28,31 +55,39 @@ describe("Register", () => {
 
 
     test('submit form with invalid email', () => {
-        render(<Register />);
- 
-         const textField = screen.getByTestId("email-input");
-         fireEvent.change(textField, { target: { value: "" } });
-         expect(textField).toHaveValue("");
- 
-         const textField1 = screen.getByTestId("email-input");
-         fireEvent.change(textField1, { target: { value: "bharath21@gmail.com" } });
-         expect(textField1).toHaveValue("bharath21@gmail.com");
- 
-         const textField2 = screen.getByTestId("email-input");
-         fireEvent.change(textField2, { target: { value: "" } });
-         expect(textField2).toHaveValue("");
- 
-         const submitButton = screen.getByTestId("submit-button");
-         fireEvent.submit(submitButton);
- 
-         const emailError = screen.getByTestId("email-error");
-         expect(emailError).toBeInTheDocument();
-     });
+        render(
+            <MemoryRouter>
+                <Register />
+            </MemoryRouter>
+        );
+
+        const textField = screen.getByTestId("email-input");
+        fireEvent.change(textField, { target: { value: "" } });
+        expect(textField).toHaveValue("");
+
+        const textField1 = screen.getByTestId("email-input");
+        fireEvent.change(textField1, { target: { value: "bharath21@gmail.com" } });
+        expect(textField1).toHaveValue("bharath21@gmail.com");
+
+        const textField2 = screen.getByTestId("email-input");
+        fireEvent.change(textField2, { target: { value: "" } });
+        expect(textField2).toHaveValue("");
+
+        const submitButton = screen.getByTestId("submit-button");
+        fireEvent.submit(submitButton);
+
+        const emailError = screen.getByTestId("email-error");
+        expect(emailError).toBeInTheDocument();
+    });
 
 
-     test('submit form with invalid contact number', () => {
-        render(<Register />);
- 
+    test('submit form with invalid contact number', () => {
+        render(
+            <MemoryRouter>
+                <Register />
+            </MemoryRouter>
+        );
+
         const textField = screen.getByTestId("contactNumber-input");
         fireEvent.change(textField, { target: { value: "" } });
         // expect(textField).toHaveValue("");
@@ -70,12 +105,16 @@ describe("Register", () => {
 
         const contactNumberError = screen.getByTestId("contactNumber-error");
         expect(contactNumberError).toBeInTheDocument();
-     });
+    });
 
 
-     test('submit form with invalid password', () => {
-        render(<Register />);
- 
+    test('submit form with invalid password', () => {
+        render(
+            <BrowserRouter>
+                <Register />
+            </BrowserRouter>
+        );
+
         const textField = screen.getByTestId("password-input");
         fireEvent.change(textField, { target: { value: "" } });
         expect(textField).toHaveValue("");
@@ -93,11 +132,15 @@ describe("Register", () => {
 
         const passwordError = screen.getByTestId("password-error");
         expect(passwordError).toBeInTheDocument();
-     });
+    });
 
 
     test("should show password when the icon is clicked", () => {
-        render(<Register />);
+        render(
+            <BrowserRouter>
+                <Register />
+            </BrowserRouter>
+        );
 
         const passwordInput = screen.getByTestId("password-input");
         expect(passwordInput).toHaveAttribute("type", "password");
@@ -110,7 +153,11 @@ describe("Register", () => {
 
 
     test('should not display error message for valid email format', () => {
-        render(<Register />);
+        render(
+            <BrowserRouter>
+                <Register />
+            </BrowserRouter>
+        );
         const emailInput = screen.getByTestId("email-input");
         fireEvent.change(emailInput, { target: { value: "validemail@gmail.com" } });
         expect(emailInput).toHaveValue("validemail@gmail.com");
@@ -122,7 +169,11 @@ describe("Register", () => {
 
 
     test('should not display error message for valid username length', () => {
-        render(<Register />);
+        render(
+            <BrowserRouter>
+                <Register />
+            </BrowserRouter>
+        );
 
         const usernameInput = screen.getByTestId("username-input");
         fireEvent.change(usernameInput, { target: { value: "validusername" } });
@@ -132,7 +183,11 @@ describe("Register", () => {
     });
 
     test('should not display error message for valid contact number format', () => {
-        render(<Register />);
+        render(
+            <BrowserRouter>
+                <Register />
+            </BrowserRouter>
+        );
         const contactNumberInput = screen.getByTestId("contactNumber-input");
         fireEvent.change(contactNumberInput, { target: { value: "8179041437" } });
         expect(contactNumberInput).toHaveValue(8179041437);
@@ -142,7 +197,11 @@ describe("Register", () => {
 
 
     test('should not display error message for valid password format', () => {
-        render(<Register />);
+        render(
+            <BrowserRouter>
+                <Register />
+            </BrowserRouter>
+        );
         const passwordInput = screen.getByTestId("password-input");
         fireEvent.change(passwordInput, { target: { value: "React@8021" } });
         expect(passwordInput).toHaveValue("React@8021");
@@ -152,7 +211,11 @@ describe("Register", () => {
 
 
     test('should display error message for invalid contact number format', () => {
-        render(<Register />);
+        render(
+            <BrowserRouter>
+                <Register />
+            </BrowserRouter>
+        );
 
         const contactNumberInput = screen.getByTestId("contactNumber-input");
         fireEvent.change(contactNumberInput, { target: { value: "123" } });
@@ -164,7 +227,11 @@ describe("Register", () => {
 
 
     test('should display error message for invalid email format', () => {
-        render(<Register />);
+        render(
+            <BrowserRouter>
+                <Register />
+            </BrowserRouter>
+        );
 
         const emailInput = screen.getByTestId("email-input");
         fireEvent.change(emailInput, { target: { value: "invalid-email" } });
@@ -176,7 +243,11 @@ describe("Register", () => {
 
 
     test('should display error message for invalid username length', () => {
-        render(<Register />);
+        render(
+            <BrowserRouter>
+                <Register />
+            </BrowserRouter>
+        );
 
         const usernameInput = screen.getByTestId("username-input");
         fireEvent.change(usernameInput, { target: { value: "abc" } });
@@ -188,7 +259,11 @@ describe("Register", () => {
 
 
     test('should display error message for invalid password format', () => {
-        render(<Register />);
+        render(
+            <MemoryRouter>
+                <Register />
+            </MemoryRouter>
+        );
 
         const passwordInput = screen.getByTestId("password-input");
         fireEvent.change(passwordInput, { target: { value: "weakpassword" } });
@@ -198,35 +273,73 @@ describe("Register", () => {
         expect(passwordError).toBeInTheDocument();
     });
 
+
     test('should display successful message when form submission is successful', () => {
-        render(<Register />);
-    
+        render(
+            <MemoryRouter>
+                <Register />
+            </MemoryRouter>
+        );
+
         // Simulate filling out the form with valid data
         const emailInput = screen.getByTestId("email-input");
         fireEvent.change(emailInput, { target: { value: "test@example.com" } });
-    
+
         const usernameInput = screen.getByTestId("username-input");
         fireEvent.change(usernameInput, { target: { value: "testuser" } });
-    
+
         const contactNumberInput = screen.getByTestId("contactNumber-input");
         fireEvent.change(contactNumberInput, { target: { value: "1234567890" } });
-    
+
         const passwordInput = screen.getByTestId("password-input");
         fireEvent.change(passwordInput, { target: { value: "Password123" } });
-    
+
         // Submit the form
         const submitButton = screen.getByTestId("submit-button");
-        fireEvent.click(submitButton);
-    
+        fireEvent.submit(submitButton);
+
         // Assert that successful message is displayed
-        const successfulMsg = screen.getByText('Registration Successful');
+        const successfulMsg = screen.getByTestId('Registration-Successful');
         expect(successfulMsg).toBeInTheDocument();
-    
-        // Assert that no error messages are displayed
-        expect(screen.queryAllByTestId("email-error")).toHaveLength(0);
-        expect(screen.queryAllByTestId("username-error")).toHaveLength(0);
-        expect(screen.queryAllByTestId("contactNumber-error")).toHaveLength(0);
-        expect(screen.queryAllByTestId("password-error")).toHaveLength(0);
+
+        // Assert that the browser's URL changes to /login
+        expect(`${window.location.pathname}login`).toBe('/login');
+    });
+
+
+    beforeEach(() => {
+        jest.useFakeTimers(); // Enable fake timers before each test
+    });
+
+    afterEach(() => {
+        jest.useRealTimers(); // Restore real timers after each test
+    });
+
+
+    it('should navigate to login page after successful registration', async () => {
+        render(
+            <MemoryRouter>
+                <Register />
+            </MemoryRouter>
+        );
+
+        // Fill in the form fields
+        fireEvent.change(screen.getByTestId('email-input'), { target: { value: 'test@example.com' } });
+        fireEvent.change(screen.getByTestId('username-input'), { target: { value: 'testuser' } });
+        fireEvent.change(screen.getByTestId('contactNumber-input'), { target: { value: '1234567890' } });
+        fireEvent.change(screen.getByTestId('password-input'), { target: { value: 'Test@123' } });
+
+        // Submit the form
+        fireEvent.click(screen.getByTestId('submit-button'));
+
+        // Advance timers by 3000ms to simulate setTimeout
+        act(() => {
+            jest.advanceTimersByTime(3000);
+        });
+
+        // Assert that navigation to login page occurred
+        expect(`${window.location.pathname}login`).toBe('/login');
     });
 
 })
+

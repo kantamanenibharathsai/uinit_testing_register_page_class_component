@@ -1,4 +1,4 @@
-const registerPageStyles = {
+const loginPageStyles = {
   mainContainer: {
     height: "100vh",
     width: "100%",
@@ -124,7 +124,7 @@ const registerPageStyles = {
     mt: "-20px",
   },
 
-  haveAccount: {
+  dontHaveAccount: {
     font: "500 15px Poppins",
     color: "#000000",
     alignSelf: "center",
@@ -139,4 +139,4 @@ const registerPageStyles = {
   },
 };
 
-export default registerPageStyles;
+export default loginPageStyles;

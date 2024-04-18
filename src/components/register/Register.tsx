@@ -128,13 +128,15 @@ import { Box, Button, InputAdornment, TextField, Typography } from "@mui/materia
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import registerPageStyles from "./Register.Styles";
+import withRouter from '../../hoc/AuthHoc';
+import { Link } from 'react-router-dom';
 
 interface FormData {
     email: string;
     username: string;
     contactNumber: string;
     password: string;
-    [key: string]: string; 
+    [key: string]: string;
 }
 
 interface State {
@@ -144,7 +146,11 @@ interface State {
     successfulMsg: string;
 }
 
-class Register extends Component<{}, State> {
+interface MyProps {
+    navigate: (path: string) => void;
+}
+
+class Register extends Component<MyProps, State> {
     state: State = {
         isPasswordVisible: false,
         formData: {
@@ -190,7 +196,7 @@ class Register extends Component<{}, State> {
             default:
                 errorMessage = value ? (/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,15}/.test(value) ? '' : '*Password must contain at least one uppercase letter, one lowercase letter, and one number, and must be between 6 and 15 characters long.') : '*Password is required!';
                 break;
-        
+
         }
 
         this.setState(prevState => ({
@@ -221,8 +227,16 @@ class Register extends Component<{}, State> {
 
         const hasErrors = Object.values(errors).some(error => error !== '');
 
+
         if (!hasErrors) {
             this.setState({ successfulMsg: 'Registration Successful', errors: {} });
+            const updatedUsersList = JSON.parse(localStorage.getItem("usersList") || "[]");
+            updatedUsersList.push(formData);
+            localStorage.setItem("usersList", JSON.stringify(updatedUsersList));
+            setTimeout(() => {
+                this.props.navigate("/login");
+            }, 3000)
+
         } else {
             this.setState({ errors, successfulMsg: '' });
         }
@@ -232,6 +246,9 @@ class Register extends Component<{}, State> {
 
     render() {
         const { isPasswordVisible, formData, errors, successfulMsg } = this.state;
+        console.log(this.props.navigate)
+
+
 
         return (
             <Box sx={registerPageStyles.mainContainer}>
@@ -247,7 +264,6 @@ class Register extends Component<{}, State> {
                                 onChange={this.handleInputChange}
                                 value={formData.email}
                                 name="email"
-
                             />
                             {errors.email && <Box data-testid="email-error" sx={registerPageStyles.errorText} component={"span"}>{errors.email}</Box>}
                         </Box>
@@ -291,11 +307,15 @@ class Register extends Component<{}, State> {
                         </Box>
                         <Button data-testid="submit-button" disableElevation disableFocusRipple disableRipple disableTouchRipple sx={registerPageStyles.SignupButton} type="submit">Sign up</Button>
                     </Box>
-                    {successfulMsg && (<Typography sx={registerPageStyles.successfulMsg}>{successfulMsg}</Typography>)}
+                    {successfulMsg && (<Typography data-testid="Registration-Successful" sx={registerPageStyles.successfulMsg}>{successfulMsg}</Typography>)}
+                    <Typography sx={registerPageStyles.haveAccount}>Already have an account?</Typography>
+                    <Link to="/login" style={{ textDecoration: "none" }}>
+                        <Typography sx={registerPageStyles.clickHere} data-testid="create-account-link">Click here to Login</Typography>
+                    </Link>
                 </Box>
             </Box>
         );
     }
 }
 
-export default Register;
+export default withRouter(Register);
